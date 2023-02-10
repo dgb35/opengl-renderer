@@ -44,5 +44,3 @@ _deps
 ### Custom ignore
 cmake-build-debug
 .idea
-thirdparty
-

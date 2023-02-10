@@ -1,10 +1,12 @@
 cmake_minimum_required(VERSION 3.20)
-project(OpenGL_learn)
-
-find_package(OpenGL REQUIRED)
+project(learn)
 
 set(CMAKE_CXX_STANDARD 23)
 
-add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/glfw)
-add_executable(OpenGL_learn main.cpp)
-target_link_libraries(OpenGL_learn glfw ${OPENGL_LIBRARY})
+add_executable(learn main.cpp)
+
+add_subdirectory(thirdparty/glad/cmake)
+add_subdirectory(thirdparty/glfw)
+
+glad_add_library(glad_lib STATIC API gl:core=3.3)
+target_link_libraries(learn glfw glad_lib ${OPENGL_LIBRARY})
