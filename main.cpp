@@ -12,19 +12,21 @@ const char *vertexShaderSource = R"END(#version 330 core
                                         layout (location = 0) in vec3 vPos;
                                         layout (location = 1) in vec3 vColor;
                                         out vec3 vertexColor;
+                                        uniform mat4 matrix;
+
                                         void main()
                                         {
                                         vertexColor = vColor;
-                                        gl_Position = vec4(vPos.x, vPos.y, vPos.z, 1.0);
+                                        gl_Position = vec4(vPos.x, vPos.y, vPos.z, 1.0) * matrix;
                                         })END";
 
 const char *fragmentShaderSource = R"END(#version 330 core
                                          out vec4 FragColor;
                                          in vec3 vertexColor;
-                                         uniform vec4 color;
+
                                          void main()
                                          {
-                                         FragColor = vec4(color.x, color.y, color.y, 1.0);
+                                         FragColor = vec4(vertexColor.x, vertexColor.y, vertexColor.y, 1.0);
                                          })END";
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
@@ -55,18 +57,18 @@ int main() {
     Shader shader{vertexShaderSource, fragmentShaderSource};
     shader.use();
 
-    float vertices[] = {
-            -0.5f, -0.5f, 0.0f,
-             0.5f, -0.5f, 0.0f,
-             0.0f,  0.5f, 0.0f,
-
-             0.5f,  0.5f, 0.0f,
-            -0.5f,  0.5f, 0.0f,
-             0.0f, -0.5f, 0.0f
-    };
-
     std::vector<float> circle;
     utilities::create_circle(circle, 0, 0, 0.6, 100);
+
+    float vertices[] = {
+            -0.5f, -0.5f, 0.0f,
+            0.5f, -0.5f, 0.0f,
+            0.0f,  0.5f, 0.0f,
+
+            0.5f,  0.5f, 0.0f,
+            -0.5f,  0.5f, 0.0f,
+            0.0f, -0.5f, 0.0f
+    };
 
     float colors[] = {
             1.0f, 0.5f, 0.0f,
@@ -85,31 +87,41 @@ int main() {
     glBindVertexArray(VAO);
 
     glBindBuffer(GL_ARRAY_BUFFER, VBO[0]);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * circle.size(), circle.data(), GL_STATIC_DRAW);
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), nullptr);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), nullptr);
     glEnableVertexAttribArray(0);
 
-//    glBindBuffer(GL_ARRAY_BUFFER, VBO[1]);
-//    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * circle.size(), circle.data(), GL_STATIC_DRAW);
-//    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), nullptr);
-//    glEnableVertexAttribArray(1);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO[1]);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(colors), colors, GL_STATIC_DRAW);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), nullptr);
+    glEnableVertexAttribArray(1);
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 
+    float alpha = 0;
     while (!glfwWindowShouldClose(window)) {
         glClearColor(0, 0, 0, 1.0);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        float timeValue = glfwGetTime();
-        float greenValue = sin(timeValue) / 2.0f + 0.5f;
-        float redValue = cos(timeValue) / 2.0f + 0.5f;
-        int vertexColorLocation = glGetUniformLocation(shader.id(), "color");
-        glUniform4f(vertexColorLocation, redValue / 2, greenValue, redValue, 1.0f);
+        float sa = sin(alpha);
+        float ca = cos(alpha);
+
+        const float matrix_v[] = {
+                sa, -ca, 0, 0,
+                ca,  sa, 0, 0,
+                0,   0,  1, 0,
+                0,   0,  0, 1
+        };
 
         glUseProgram(shader.id());
         glBindVertexArray(VAO);
-        glDrawArrays(GL_TRIANGLES, 0, circle.size() * 3);
+        glDrawArrays(GL_TRIANGLES, 0, 6);
+
+        auto matrix = glGetUniformLocation(shader.id(), "matrix");
+        glUniformMatrix4fv(matrix, 1, GL_FALSE, matrix_v);
+
+        alpha += 0.01;
 
         processInput(window);
         glfwSwapBuffers(window);
