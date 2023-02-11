@@ -3,7 +3,12 @@ project(learn)
 
 set(CMAKE_CXX_STANDARD 23)
 
-add_executable(learn main.cpp)
+add_executable(learn
+        main.cpp
+        utilities.h
+        shader.h
+        shader.cpp
+        )
 
 add_subdirectory(thirdparty/glad/cmake)
 add_subdirectory(thirdparty/glfw)
