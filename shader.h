@@ -5,9 +5,9 @@
 #include <string>
 
 enum ShaderType {
+    Unknown,
     Vertex,
-    Fragment,
-    Program
+    Fragment
 };
 
 class Shader {
@@ -16,7 +16,7 @@ public:
     ~Shader();
 
     void use() const;
-    uint32_t id() const;
+    [[nodiscard]] uint32_t id() const;
 
     void setBool(const std::string &name, bool value) const;
     void setInt(const std::string &name, int value) const;
@@ -28,6 +28,8 @@ private:
     void check_compile_errors(uint32_t object, ShaderType type) const;
 
     uint32_t _id{};
+    uint32_t _vertexShader{};
+    uint32_t _fragmentShader{};
 };
 
 

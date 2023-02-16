@@ -12,6 +12,7 @@ add_executable(learn
 
 add_subdirectory(thirdparty/glad/cmake)
 add_subdirectory(thirdparty/glfw)
+add_subdirectory(thirdparty/glm)
 
 glad_add_library(glad_lib STATIC API gl:core=3.3)
-target_link_libraries(learn glfw glad_lib ${OPENGL_LIBRARY})
+target_link_libraries(learn glfw glad_lib ${OPENGL_LIBRARY} glm::glm)

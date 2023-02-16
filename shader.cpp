@@ -10,14 +10,14 @@ Shader::Shader(const char *vs, const char *fs) {
 void Shader::create_program(const char *vs,const char *fs)
 {
     _id = glCreateProgram();
-    uint32_t vertexShader = compile_shader(vs, ShaderType::Vertex);
-    uint32_t fragmentShader = compile_shader(fs, ShaderType::Fragment);
+    _vertexShader = compile_shader(vs, ShaderType::Vertex);
+    _fragmentShader = compile_shader(fs, ShaderType::Fragment);
 
-    glAttachShader(_id, vertexShader);
-    glAttachShader(_id, fragmentShader);
+    glAttachShader(_id, _vertexShader);
+    glAttachShader(_id, _fragmentShader);
     glLinkProgram(_id);
 
-    check_compile_errors(_id, ShaderType::Program);
+    check_compile_errors(_id, ShaderType::Unknown);
 }
 
 uint32_t Shader::compile_shader(const char *source, ShaderType type) const
@@ -93,4 +93,8 @@ uint32_t Shader::id() const {
 }
 
 Shader::~Shader() {
+    glDeleteShader(_vertexShader);
+    glDeleteShader(_fragmentShader);
+
+    glDeleteProgram(_id);
 }
