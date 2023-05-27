@@ -2,7 +2,7 @@
 #define LEARN_SHADER_H
 
 #include <cstdint>
-#include <string>
+#include <string_view>
 
 enum ShaderType {
     Unknown,
@@ -10,10 +10,10 @@ enum ShaderType {
     Fragment
 };
 
-class Shader {
+class ShaderProgram {
 public:
-    Shader(const char* vs, const char* fs);
-    ~Shader();
+    ShaderProgram(std::string_view vs, std::string_view fs);
+    ~ShaderProgram();
 
     void use() const;
     [[nodiscard]] uint32_t id() const;
@@ -23,9 +23,9 @@ public:
     void setFloat(const std::string &name, float value) const;
 
 private:
-    void create_program(const char* vs, const char* fs);
-    uint32_t compile_shader(const char* source, ShaderType type) const;
-    void check_compile_errors(uint32_t object, ShaderType type) const;
+    void create_program(std::string_view vs, std::string_view fs);
+    [[nodiscard]] uint32_t compile_shader(std::string_view source, ShaderType type) const;
+    void check_errors(uint32_t object, ShaderType type) const;
 
     uint32_t _id{};
     uint32_t _vertexShader{};

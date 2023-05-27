@@ -42,5 +42,5 @@ CTestTestfile.cmake
 _deps
 
 ### Custom ignore
-cmake-build-debug
-.idea
+cmake-build-*/
+.idea/
